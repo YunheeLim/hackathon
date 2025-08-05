@@ -14,7 +14,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    id: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -35,14 +35,14 @@ const LoginPage = () => {
     setLoading(true);
 
     // 간단한 유효성 검사
-    if (!formData.email || !formData.password) {
-      setError("이메일과 비밀번호를 모두 입력해주세요.");
+    if (!formData.id || !formData.password) {
+      setError("사번과 비밀번호를 모두 입력해주세요.");
       setLoading(false);
       return;
     }
 
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.id, formData.password);
       if (result.success) {
         navigate("/");
       } else {
@@ -98,12 +98,12 @@ const LoginPage = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="이메일 주소"
-              name="email"
-              autoComplete="email"
+              id="id"
+              label="사번"
+              name="id"
+              autoComplete="id"
               autoFocus
-              value={formData.email}
+              value={formData.id}
               onChange={handleChange}
             />
             <TextField

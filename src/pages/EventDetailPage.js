@@ -290,6 +290,10 @@ const EventDetailPage = () => {
                   </Button>
                 </Box>
               </Grid>
+              <Typography color="error">
+                (상품 투표 관련)현 컨플루언스 시스템 상으로 상품(Ex 아아, 라떼)
+                투표는 없는 것 같은데 어케 도입할지 고려 필요
+              </Typography>
             </Grid>
 
             <Divider sx={{ my: 2 }} />
@@ -401,21 +405,6 @@ const EventDetailPage = () => {
             </Card>
           </Grid>
 
-          {/* 선착순 공지 */}
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <WarningIcon sx={{ color: "warning.main", mr: 1 }} />
-                  <Typography variant="h6">선착순 공지</Typography>
-                </Box>
-                <Typography variant="body1" color="text.secondary">
-                  {event.firstComeFirstServed}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
           {/* 참가신청명단 */}
           <Grid item xs={12}>
             <Card>
@@ -447,6 +436,119 @@ const EventDetailPage = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* 선착순 공지 */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Typography variant="h6">
+                    추가 신청(얘는 신청 마감일 때에만 표시됨)
+                  </Typography>
+                </Box>
+                <Typography variant="body1" color="text.secondary">
+                  {event.firstComeFirstServed}
+                  <CardContent>
+                    <Typography variant="h5" gutterBottom>
+                      대기명단 ({event.participants.length}명)
+                    </Typography>
+                    <TableContainer component={Paper} sx={{ mt: 2 }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              소속
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              직위
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              성명
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              신청일
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {event.participants.map((participant, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{participant.company}</TableCell>
+                              <TableCell>{participant.position}</TableCell>
+                              <TableCell>{participant.name}</TableCell>
+                              <TableCell>{participant.registeredAt}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Q&A Section */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
+                  댓글 및 답변
+                </Typography>
+                {/* Existing Comments */}
+                <Box>
+                  <Typography variant="subtitle1" gutterBottom>
+                    사용자1:
+                  </Typography>
+                  <Typography variant="body2" gutterBottom>
+                    행사 장소는 어디인가요?
+                  </Typography>
+                  <Box ml={2}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      답변:
+                    </Typography>
+                    <Typography variant="body2">
+                      행사 장소는 서울 코엑스 그랜드볼룸입니다.
+                    </Typography>
+                  </Box>
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                <Box>
+                  <Typography variant="subtitle1" gutterBottom>
+                    사용자2:
+                  </Typography>
+                  <Typography variant="body2" gutterBottom>
+                    참가비는 무료인가요?
+                  </Typography>
+                  <Box ml={2}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      답변:
+                    </Typography>
+                    <Typography variant="body2">
+                      네, 이번 행사의 참가비는 무료입니다.
+                    </Typography>
+                  </Box>
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                {/* Comment Input */}
+                <Box mt={2}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    댓글 작성하기
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                    placeholder="댓글을 작성하세요..."
+                  />
+                  <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                    작성
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </Grid>

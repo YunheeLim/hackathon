@@ -5,13 +5,11 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider } from "./contexts/AuthContext";
 import Navigation from "./components/Navigation";
 import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
 import EventsListPage from "./pages/EventsListPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import ApplicationStatusPage from "./pages/ApplicationStatusPage";
 import MyEventsPage from "./pages/MyEventsPage";
 import MyEventFormPage from "./pages/MyEventFormPage";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 const theme = createTheme({
   palette: {
@@ -48,36 +46,14 @@ function App() {
             <Navigation />
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/" element={<HomePage />} />
-              <Route path="/events" element={<EventsListPage />} />
+              <Route path="/" element={<EventsListPage />} />
               <Route path="/events/:id" element={<EventDetailPage />} />
               <Route path="/applications" element={<ApplicationStatusPage />} />
 
               {/* 내 행사 관리 라우트 */}
-              <Route
-                path="/my-events"
-                element={
-                  <ProtectedRoute>
-                    <MyEventsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-events/new"
-                element={
-                  <ProtectedRoute>
-                    <MyEventFormPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-events/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <MyEventFormPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/my-events" element={<MyEventsPage />} />
+              <Route path="/my-events/new" element={<MyEventFormPage />} />
+              <Route path="/my-events/:id/edit" element={<MyEventFormPage />} />
             </Routes>
           </div>
         </Router>

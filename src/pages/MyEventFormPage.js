@@ -168,7 +168,7 @@ const MyEventFormPage = () => {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="행사 설명 *"
+              label="행사 설명 *(가능하다면 편집라이브러리 적용)"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               error={Boolean(errors.description)}
@@ -257,14 +257,25 @@ const MyEventFormPage = () => {
               onChange={(e) => handleInputChange("organizer", e.target.value)}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="이미지 URL"
-              value={formData.imageUrl}
-              onChange={(e) => handleInputChange("imageUrl", e.target.value)}
-              helperText="행사 이미지의 URL을 입력하세요"
-            />
+
+          <Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                파일 첨부
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="file"
+                inputProps={{ accept: "*" }} // Accept all file types
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  handleInputChange("attachedFile", file); // Update formData with the uploaded file
+                }}
+                helperText="파일을 업로드하세요 (이미지, PPT, PDF 등 모든 파일 가능)"
+              />
+            </Grid>
           </Grid>
 
           {/* 연락처 및 요구사항 */}
@@ -353,7 +364,7 @@ const MyEventFormPage = () => {
       </Paper>
 
       {/* 미리보기 카드 */}
-      {formData.title && (
+      {/* {formData.title && (
         <Card sx={{ mt: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -382,7 +393,7 @@ const MyEventFormPage = () => {
             </Box>
           </CardContent>
         </Card>
-      )}
+      )} */}
     </Container>
   );
 };

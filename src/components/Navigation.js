@@ -53,12 +53,9 @@ const Navigation = () => {
   };
 
   const menuItems = [
-    { label: "홈", path: "/" },
-    { label: "행사 목록", path: "/events" },
     { label: "신청 현황", path: "/applications" },
+    { label: "내 행사 관리", path: "/my-events" },
   ];
-
-  const eventManagementItems = [{ label: "내 행사 관리", path: "/my-events" }];
 
   return (
     <AppBar
@@ -104,33 +101,6 @@ const Navigation = () => {
               {item.label}
             </Button>
           ))}
-
-          {/* 행사 관리 메뉴 */}
-          {isLoggedIn() && (
-            <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-              {eventManagementItems.map((item) => (
-                <Button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  sx={{
-                    mx: 0.5,
-                    color: isActive(item.path) ? "#1976d2" : "text.primary",
-                    borderBottom: isActive(item.path)
-                      ? "2px solid #1976d2"
-                      : "none",
-                    borderRadius: 0,
-                    fontSize: "0.875rem",
-                    "&:hover": {
-                      backgroundColor: "transparent",
-                      color: "#1976d2",
-                    },
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Box>
-          )}
         </Box>
 
         {/* Desktop User Menu */}
@@ -159,25 +129,6 @@ const Navigation = () => {
                   horizontal: "right",
                 }}
               >
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    navigate("/profile");
-                  }}
-                >
-                  <AccountCircleIcon sx={{ mr: 1 }} />
-                  프로필
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    navigate("/applications");
-                  }}
-                >
-                  <CheckCircleIcon sx={{ mr: 1 }} />
-                  신청 현황
-                </MenuItem>
-                <Divider />
                 <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
               </Menu>
             </>
@@ -226,55 +177,9 @@ const Navigation = () => {
               </MenuItem>
             ))}
 
-            {/* 행사 관리 메뉴 */}
-            {isLoggedIn() && (
-              <>
-                <Divider />
-                <MenuItem
-                  disabled
-                  sx={{ color: "text.secondary", fontSize: "0.875rem" }}
-                >
-                  행사 관리
-                </MenuItem>
-                {eventManagementItems.map((item) => (
-                  <MenuItem
-                    key={item.path}
-                    onClick={() => {
-                      navigate(item.path);
-                      handleMenuClose();
-                    }}
-                    sx={{
-                      color: isActive(item.path) ? "#1976d2" : "text.primary",
-                      fontWeight: isActive(item.path) ? "bold" : "normal",
-                      pl: 3,
-                    }}
-                  >
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </>
-            )}
             <Divider />
             {isLoggedIn() ? (
               <>
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    navigate("/profile");
-                  }}
-                >
-                  <AccountCircleIcon sx={{ mr: 1 }} />
-                  프로필
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    navigate("/applications");
-                  }}
-                >
-                  <CheckCircleIcon sx={{ mr: 1 }} />
-                  신청 현황
-                </MenuItem>
                 <Divider />
                 <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
               </>
