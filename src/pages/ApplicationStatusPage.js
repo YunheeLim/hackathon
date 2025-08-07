@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -20,6 +20,16 @@ import {
   DialogContent,
   DialogActions,
   Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EventIcon from "@mui/icons-material/Event";
@@ -102,6 +112,44 @@ const ApplicationStatusPage = () => {
     return <CheckCircleIcon />;
   };
 
+  const [voteModalOpen, setVoteModalOpen] = useState(false);
+  const [selectedVote, setSelectedVote] = useState("");
+  const [votedAppIds, setVotedAppIds] = useState([]); // 투표 완료된 신청 id 목록
+  const [currentVotingAppId, setCurrentVotingAppId] = useState(null); // 현재 투표 중인 신청 id
+
+  const pollItems = [
+    { value: "1", label: "제육볶음" },
+    { value: "2", label: "돈까스" },
+  ];
+
+  const openModal = (appId) => {
+    setCurrentVotingAppId(appId);
+    setVoteModalOpen(true);
+  };
+  const closeModal = () => {
+    setVoteModalOpen(false);
+    setSelectedVote("");
+    setCurrentVotingAppId(null);
+  };
+  const handleVote = () => {
+    if (currentVotingAppId !== null) {
+      setVotedAppIds((prev) => [...prev, currentVotingAppId]);
+    }
+    closeModal();
+  };
+
+  // Prevent back navigation
+  useEffect(() => {
+    const handlePopState = (e) => {
+      window.history.pushState(null, "", window.location.pathname);
+    };
+    window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5", py: 4 }}>
       <Container maxWidth="lg">
@@ -115,72 +163,95 @@ const ApplicationStatusPage = () => {
           신청 현황
         </Typography>
 
-        {/* Applications List */}
-        <Grid container spacing={3}>
-          {applications.map((application) => (
-            <Grid item xs={12} key={application.id}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      mb: 2,
-                    }}
-                  >
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" gutterBottom>
+        {/* Applications Table */}
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>행사명</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>일시</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>장소</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>상태</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>투표</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {applications.map((application) => {
+                const voted = votedAppIds.includes(application.id);
+                return (
+                  <TableRow key={application.id}>
+                    <TableCell>
+                      <Button
+                        size="small"
+                        variant="none"
+                        sx={{
+                          textDecoration: "underline",
+                          color: "primary.main",
+                        }}
+                        onClick={() =>
+                          navigate(`/events/${application.eventId}`)
+                        }
+                      >
                         {application.eventTitle}
-                      </Typography>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                      >
-                        <EventIcon
-                          sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                          {application.eventDate}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
-                      >
-                        <LocationOnIcon
-                          sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                          {application.eventLocation}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ textAlign: "right" }}>
+                      </Button>
+                    </TableCell>
+                    <TableCell>{application.eventDate}</TableCell>
+                    <TableCell>{application.eventLocation}</TableCell>
+                    <TableCell>
                       <Chip
                         icon={getStatusIcon(application.status)}
                         label={application.status}
                         color={getStatusColor(application.status)}
-                        sx={{ mb: 1 }}
+                        size="small"
                       />
-                      <Typography variant="body2" color="text.secondary">
-                        신청일: {application.appliedAt}
-                      </Typography>
-                    </Box>
-                  </Box>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>
+                      <Button
+                        size="small"
+                        variant={voted ? "contained" : "outlined"}
+                        color={voted ? "success" : "primary"}
+                        disabled={voted}
+                        onClick={() => openModal(application.id)}
+                      >
+                        {voted ? "투표완료" : "투표하기"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => navigate(`/events/${application.eventId}`)}
-                    >
-                      행사 정보
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        {/* 투표 모달 */}
+        <Dialog open={voteModalOpen} onClose={closeModal}>
+          <DialogTitle>점심 메뉴를 골라주세요</DialogTitle>
+          <DialogContent>
+            <RadioGroup
+              value={selectedVote}
+              onChange={(e) => setSelectedVote(e.target.value)}
+            >
+              {pollItems.map((item) => (
+                <FormControlLabel
+                  key={item.value}
+                  value={item.value}
+                  control={<Radio />}
+                  label={item.label}
+                />
+              ))}
+            </RadioGroup>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeModal}>취소</Button>
+            <Button
+              onClick={handleVote}
+              variant="contained"
+              disabled={!selectedVote}
+            >
+              투표
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {applications.length === 0 && (
           <Box sx={{ textAlign: "center", py: 8 }}>

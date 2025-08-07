@@ -37,64 +37,73 @@ const EventsListPage = () => {
   const navigate = useNavigate();
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
-  const [viewMode, setViewMode] = useState("card");
 
   const events = [
     {
       id: 1,
-      title: "2024 기술 컨퍼런스",
-      date: "2024-01-15",
+      title: "2026 기술 컨퍼런스",
+      date: "2026-01-15",
       location: "서울 코엑스",
       category: "컨퍼런스",
       description: "최신 기술 트렌드를 공유하는 연례 기술 컨퍼런스입니다.",
       capacity: 500,
       registered: 320,
       developmentTime: true,
+      applyStart: "2026-01-01T09:00:00",
+      applyEnd: "2026-01-10T18:00:00",
     },
     {
       id: 2,
       title: "스타트업 네트워킹 데이",
-      date: "2024-01-20",
+      date: "2025-08-20",
       location: "강남구 스타트업 허브",
       category: "네트워킹",
       description:
         "스타트업 창업자들과 투자자들이 만나는 네트워킹 이벤트입니다.",
       capacity: 100,
-      registered: 100,
+      registered: 40,
       developmentTime: false,
+      applyStart: "2025-08-05T09:00:00",
+      applyEnd: "2025-08-15T18:00:00",
     },
     {
       id: 3,
       title: "AI 워크샵",
-      date: "2024-01-25",
+      date: "2026-01-25",
       location: "판교 테크노밸리",
       category: "워크샵",
       description: "AI 기술을 직접 체험하고 학습할 수 있는 워크샵입니다.",
       capacity: 50,
-      registered: 25,
+      registered: 50,
       developmentTime: true,
+      applyStart: "2026-01-20T09:00:00",
+      applyEnd: "2026-01-22T18:00:00",
     },
     {
       id: 4,
       title: "UX/UI 디자인 컨퍼런스",
-      date: "2024-02-01",
+      date: "2026-02-01",
       location: "서울 디자인 센터",
       category: "컨퍼런스",
       description: "UX/UI 디자인 트렌드와 베스트 프랙티스를 공유합니다.",
       capacity: 200,
       registered: 80,
       developmentTime: true,
+      applyStart: "2026-01-10T09:00:00",
+      applyEnd: "2026-01-25T18:00:00",
     },
     {
       id: 5,
       title: "블록체인 개발자 밋업",
-      date: "2024-02-05",
+      date: "2026-02-05",
       location: "강남구 개발자 공간",
       category: "밋업",
       description: "블록체인 개발자들이 모여 기술을 공유하는 밋업입니다.",
       capacity: 80,
       registered: 45,
       developmentTime: false,
+      applyStart: "2026-01-15T09:00:00",
+      applyEnd: "2026-01-20T18:00:00",
     },
     {
       id: 6,
@@ -106,6 +115,8 @@ const EventsListPage = () => {
       capacity: 300,
       registered: 150,
       developmentTime: true,
+      applyStart: "2024-02-01T09:00:00",
+      applyEnd: "2024-02-05T18:00:00",
     },
   ];
 
@@ -158,127 +169,20 @@ const EventsListPage = () => {
     return developmentTime ? "info" : "default";
   };
 
-  const handleViewModeChange = (event, newViewMode) => {
-    if (newViewMode !== null) {
-      setViewMode(newViewMode);
-    }
+  // 현재 시간 기준으로 이벤트 상태를 동적으로 반환
+  const getEventStatus = (event) => {
+    const now = new Date();
+    const start = new Date(event.applyStart);
+    const end = new Date(event.applyEnd);
+
+    console.log(now, start, end);
+
+    if (now < start) return "upcoming"; // 신청전
+    if (now >= start && now <= end && event.registered < event.capacity)
+      return "open"; // 진행중
+    if (now > end && event.registered < event.capacity) return "closed"; // 신청마감
+    return "ended"; // 종료
   };
-
-  const CardView = () => (
-    <Grid container spacing={3}>
-      {filteredAndSortedEvents.map((event) => (
-        <Grid item xs={12} md={6} lg={4} key={event.id}>
-          <Card
-            sx={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  mb: 2,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  gutterBottom
-                  sx={{ flex: 1 }}
-                >
-                  {event.title}
-                </Typography>
-                <Chip
-                  label={
-                    event.developmentTime
-                      ? "역량개발시간 부여"
-                      : "역량개발시간 미부여"
-                  }
-                  color={getDevelopmentTimeColor(event.developmentTime)}
-                  size="small"
-                  icon={<SchoolIcon />}
-                />
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" paragraph>
-                {event.description}
-              </Typography>
-
-              <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                <EventIcon
-                  sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {event.date}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <LocationOnIcon
-                  sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {event.location}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
-                }}
-              >
-                <Chip
-                  label={event.category}
-                  color={getCategoryColor(event.category)}
-                  size="small"
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {event.registered}/{event.capacity}명
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  width: "100%",
-                  bgcolor: "grey.200",
-                  borderRadius: 1,
-                  height: 8,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: `${(event.registered / event.capacity) * 100}%`,
-                    bgcolor:
-                      event.registered === event.capacity
-                        ? "error.main"
-                        : "success.main",
-                    height: "100%",
-                    borderRadius: 1,
-                  }}
-                />
-              </Box>
-            </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                onClick={() => navigate(`/events/${event.id}`)}
-                fullWidth
-              >
-                자세히 보기
-              </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
-  );
 
   const TableView = () => (
     <TableContainer component={Paper}>
@@ -356,9 +260,10 @@ const EventsListPage = () => {
                 <Button
                   size="small"
                   variant="outlined"
+                  disabled={getEventStatus(event) !== "open"}
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  자세히 보기
+                  {getEventStatus(event)}
                 </Button>
               </TableCell>
             </TableRow>
@@ -416,35 +321,11 @@ const EventsListPage = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <ToggleButtonGroup
-                value={viewMode}
-                exclusive
-                onChange={handleViewModeChange}
-                aria-label="view mode"
-                sx={{ width: "100%" }}
-              >
-                <ToggleButton value="card" aria-label="card view">
-                  <ViewModuleIcon />
-                </ToggleButton>
-                <ToggleButton value="table" aria-label="table view">
-                  <TableChartIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
           </Grid>
         </Box>
 
         {/* Content */}
-        {viewMode === "card" ? <CardView /> : <TableView />}
-
-        {filteredAndSortedEvents.length === 0 && (
-          <Box sx={{ textAlign: "center", py: 8 }}>
-            <Typography variant="h6" color="text.secondary">
-              검색 조건에 맞는 행사가 없습니다.
-            </Typography>
-          </Box>
-        )}
+        <TableView />
       </Container>
     </Box>
   );

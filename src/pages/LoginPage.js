@@ -44,7 +44,8 @@ const LoginPage = () => {
     try {
       const result = await login(formData.id, formData.password);
       if (result.success) {
-        navigate("/");
+        console.log("로그인 성공");
+        navigate("/home");
       } else {
         setError(result.error || "로그인에 실패했습니다.");
       }

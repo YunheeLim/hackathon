@@ -11,7 +11,7 @@ import {
   Avatar,
   Divider,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, replace } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import EventIcon from "@mui/icons-material/Event";
@@ -41,7 +41,7 @@ const Navigation = () => {
   const handleLogout = () => {
     logout();
     handleMenuClose();
-    navigate("/login");
+    navigate("/");
   };
 
   const handleLogin = () => {
@@ -74,9 +74,9 @@ const Navigation = () => {
             fontWeight: "bold",
             color: "#1976d2",
           }}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
         >
-          행사신청 플랫폼
+          Eventry
         </Typography>
 
         {/* Desktop Menu */}
@@ -105,95 +105,32 @@ const Navigation = () => {
 
         {/* Desktop User Menu */}
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
-          {isLoggedIn() ? (
-            <>
-              <Button
-                onClick={handleProfileMenuOpen}
-                sx={{ color: "text.primary", textTransform: "none" }}
-              >
-                <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
-                  {user.name.charAt(0)}
-                </Avatar>
-                {user.name}
-              </Button>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <Button variant="contained" onClick={handleLogin} sx={{ ml: 2 }}>
-              로그인
+          <>
+            <Button
+              onClick={handleProfileMenuOpen}
+              sx={{ color: "text.primary", textTransform: "none" }}
+            >
+              <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
+                {/* {user.name.charAt(0)} */}
+              </Avatar>
+              홍길동
             </Button>
-          )}
-        </Box>
-
-        {/* Mobile Menu Button */}
-        <Box sx={{ display: { xs: "flex", md: "none" } }}>
-          <IconButton
-            size="large"
-            onClick={handleMobileMenuOpen}
-            color="inherit"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            anchorEl={mobileMenuAnchor}
-            open={Boolean(mobileMenuAnchor)}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            {menuItems.map((item) => (
-              <MenuItem
-                key={item.path}
-                onClick={() => {
-                  navigate(item.path);
-                  handleMenuClose();
-                }}
-                sx={{
-                  color: isActive(item.path) ? "#1976d2" : "text.primary",
-                  fontWeight: isActive(item.path) ? "bold" : "normal",
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-
-            <Divider />
-            {isLoggedIn() ? (
-              <>
-                <Divider />
-                <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
-              </>
-            ) : (
-              <MenuItem
-                onClick={() => {
-                  handleLogin();
-                  handleMenuClose();
-                }}
-              >
-                로그인
-              </MenuItem>
-            )}
-          </Menu>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
+            </Menu>
+          </>
         </Box>
       </Toolbar>
     </AppBar>
