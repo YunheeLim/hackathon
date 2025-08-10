@@ -18,3 +18,109 @@ TODO
 - 필터 옵션으로 역량, 오픈/마감 추가
 - 등록 폼 초기 유효성 오류
 - html 형태 텍스트와 이미지로 보여주기
+
+
+
+import React, { useState, useEffect } from "react";
+
+interface EventItem {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  category: string;
+  description: string;
+  capacity: number;
+  registered: number;
+  developmentTime: boolean;
+  applyStart: string;
+  applyEnd: string;
+  state: string; // "before" | "open" | "close"
+}
+
+const App: React.FC = () => {
+  const [msg, setMsg] = useState<string>("");
+
+  const [events, setEvents] = useState<EventItem[]>([
+    {
+      id: 2,
+      title: "스타트업 네트워킹 데이",
+      date: "2025-08-20",
+      location: "강남구 스타트업 허브",
+      category: "네트워킹",
+      description:
+        "스타트업 창업자들과 투자자들이 만나는 네트워킹 이벤트입니다.",
+      capacity: 100,
+      registered: 40,
+      developmentTime: false,
+      // 테스트 위해 현재 시각보다 5초 뒤에 applyStart 설정
+      applyStart: new Date(Date.now() + 5000).toISOString(),
+      applyEnd: new Date(Date.now() + 10000).toISOString(),
+      state: "before",
+    },
+  ]);
+
+  useEffect(() => {
+    console.log(events);
+    const timer = setInterval(() => {
+      const now = new Date();
+
+      setEvents((prev) =>
+        prev.map((item) => {
+          if (
+            new Date(item.applyStart).getTime() - now.getTime() > 2000 &&
+            new Date(item.applyStart).getTime() - now.getTime() <= 3000
+          ) {
+            setMsg("API 보냄");
+          }
+          if (new Date(item.applyStart) <= now && item.state === "before") {
+            setMsg("오픈");
+            return { ...item, state: "open" };
+          } else if (new Date(item.applyEnd) < now && item.state === "open") {
+            setMsg("마감");
+            return { ...item, state: "close" };
+          }
+
+          return item;
+        })
+      );
+    }, 1000); // 1초마다 상태 체크
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+      <h1>이벤트 목록</h1>
+      <table
+        border={1}
+        cellPadding={10}
+        style={{ borderCollapse: "collapse", minWidth: "500px" }}
+      >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>제목</th>
+            <th>상태</th>
+            <th>applyStart</th>
+            <th>applyEnd</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map((e) => (
+            <tr key={e.id}>
+              <td>{e.id}</td>
+              <td>{e.title}</td>
+              <td>{e.state}</td>
+              <td>{new Date(e.applyStart).toLocaleString()}</td>
+              <td>{new Date(e.applyEnd).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p style={{ marginTop: "20px" }}>{msg}</p>
+    </div>
+  );
+};
+
+export default App;
