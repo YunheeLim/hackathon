@@ -614,9 +614,6 @@ const EventDetailPage = () => {
               <Typography variant="body1" color="text.secondary" paragraph>
                 행사 신청이 성공적으로 완료되었습니다.
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                확인 이메일이 발송되었으니 확인해주세요.
-              </Typography>
             </Box>
           </DialogContent>
           <DialogActions sx={{ justifyContent: "center", pb: 3 }}>

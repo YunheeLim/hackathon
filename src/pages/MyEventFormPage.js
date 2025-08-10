@@ -18,12 +18,15 @@ import {
 import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 // Toast UI Editor import (add this at the top)
-import {
-  Editor as ToastEditor,
-  Viewer as ToastViewer,
-} from "@toast-ui/react-editor";
-import "@toast-ui/editor/dist/toastui-editor.css";
-import "@toast-ui/editor/dist/toastui-editor-viewer.css";
+// import {
+//   Editor as ToastEditor,
+//   Viewer as ToastViewer,
+// } from "@toast-ui/react-editor";
+// import "@toast-ui/editor/dist/toastui-editor.css";
+// import "@toast-ui/editor/dist/toastui-editor-viewer.css";
+
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const MyEventFormPage = () => {
   const navigate = useNavigate();
@@ -91,42 +94,60 @@ const MyEventFormPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    let hasError = false;
 
     if (!formData.title.trim()) {
-      newErrors.title = "행사명을 입력해주세요.";
+      setErrors((prev) => ({ ...prev, title: "행사명을 입력해주세요." }));
+      hasError = true;
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = "행사 설명을 입력해주세요.";
+      setErrors((prev) => ({
+        ...prev,
+        description: "행사 설명을 입력해주세요.",
+      }));
+      hasError = true;
     }
 
     if (!formData.date) {
-      newErrors.date = "날짜를 선택해주세요.";
+      setErrors((prev) => ({ ...prev, date: "날짜를 선택해주세요." }));
+      hasError = true;
     }
 
     if (!formData.location.trim()) {
-      newErrors.location = "장소를 입력해주세요.";
+      setErrors((prev) => ({ ...prev, location: "장소를 입력해주세요." }));
+      hasError = true;
     }
 
     if (!formData.maxParticipants || formData.maxParticipants <= 0) {
-      newErrors.maxParticipants = "유효한 참가자 수를 입력해주세요.";
+      setErrors((prev) => ({
+        ...prev,
+        maxParticipants: "유효한 참가자 수를 입력해주세요.",
+      }));
+      hasError = true;
     }
 
     if (!formData.contactEmail.trim()) {
-      newErrors.contactEmail = "연락처 이메일을 입력해주세요.";
+      setErrors((prev) => ({
+        ...prev,
+        contactEmail: "연락처 이메일을 입력해주세요.",
+      }));
+      hasError = true;
     } else if (!/\S+@\S+\.\S+/.test(formData.contactEmail)) {
-      newErrors.contactEmail = "유효한 이메일 주소를 입력해주세요.";
+      setErrors((prev) => ({
+        ...prev,
+        contactEmail: "유효한 이메일 주소를 입력해주세요.",
+      }));
+      hasError = true;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasError;
   };
 
   const handleSubmit = async () => {
-    // if (!validateForm()) {
-    //   return;
-    // }
+    if (!validateForm()) {
+      return;
+    }
 
     console.log(formData);
     setIsSubmitting(true);
@@ -140,16 +161,6 @@ const MyEventFormPage = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleAddPollOption = () => {
-    setPollOptions((prev) => [...prev, ""]);
-  };
-  const handleRemovePollOption = (idx) => {
-    setPollOptions((prev) => prev.filter((_, i) => i !== idx));
-  };
-  const handlePollOptionChange = (idx, value) => {
-    setPollOptions((prev) => prev.map((opt, i) => (i === idx ? value : opt)));
   };
 
   return (
@@ -235,28 +246,35 @@ const MyEventFormPage = () => {
           <Typography variant="h6" fontWeight="bold" gutterBottom>
             행사 설명
           </Typography>
-          <ToastEditor
-            initialValue={formData.description}
-            previewStyle="vertical"
-            height="320px"
-            initialEditType="wysiwyg"
-            useCommandShortcut={true}
-            onChange={() => {
-              const data = editorRef.current.getInstance().getMarkdown();
-              handleInputChange("description", data);
-            }}
-            ref={editorRef}
-            hooks={{
-              addImageBlobHook: async (blob, callback) => {
-                // 1. base64로 변환 (임시)
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  callback(reader.result, "image");
-                };
-                reader.readAsDataURL(blob);
-              },
-            }}
-          />
+          <Box sx={{ background: "#fff" }}>
+            <ReactQuill
+              theme="snow"
+              value={formData.description}
+              onChange={(value) => handleInputChange("description", value)}
+              modules={{
+                toolbar: [
+                  [{ header: [1, 2, false] }],
+                  ["bold", "italic", "underline", "strike"],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["link", "image"],
+                  ["clean"],
+                ],
+              }}
+              formats={[
+                "header",
+                "bold",
+                "italic",
+                "underline",
+                "strike",
+                "list",
+                "bullet",
+                "link",
+                "image",
+              ]}
+              style={{ height: "300px", paddingBottom: "43.4px" }}
+            />
+          </Box>
+
           {errors.description && (
             <FormHelperText error sx={{ mt: 1 }}>
               {errors.description}
@@ -287,13 +305,22 @@ const MyEventFormPage = () => {
         </Box>
       </Paper>
 
-      <Paper>
+      {/* <Paper>
         <ToastViewer
           initialValue={formData.description}
           key={formData.description} // force re-render on content change
           usageStatistics={false}
         />
-      </Paper>
+      </Paper> */}
+
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: "10px",
+          minHeight: "100px",
+        }}
+        dangerouslySetInnerHTML={{ __html: formData.description }}
+      />
     </Container>
   );
 };
