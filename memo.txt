@@ -1,0 +1,20 @@
+/login
+
+/event/create
+/event/register
+/event/delete
+
+/events
+
+/myevents
+/myapllications
+
+
+TODO
+- 로그인 실패 처리
+- 신청 시간 되면 상태 변경
+- 참가자/정원 컬럼 추가
+- 참가자 모달 홈페이지로 이동
+- 필터 옵션으로 역량, 오픈/마감 추가
+- 등록 폼 초기 유효성 오류
+- html 형태 텍스트와 이미지로 보여주기

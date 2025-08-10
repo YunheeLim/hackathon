@@ -18,8 +18,12 @@ import {
 import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 // Toast UI Editor import (add this at the top)
-import { Editor as ToastEditor } from "@toast-ui/react-editor";
+import {
+  Editor as ToastEditor,
+  Viewer as ToastViewer,
+} from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
+import "@toast-ui/editor/dist/toastui-editor-viewer.css";
 
 const MyEventFormPage = () => {
   const navigate = useNavigate();
@@ -120,18 +124,17 @@ const MyEventFormPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
-    setIsSubmitting(true);
     console.log(formData);
-    try {
-      // 실제로는 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsSubmitting(true);
 
+    try {
+      console.log("formData");
       // 성공 시 내 행사 관리 페이지로 이동
-      navigate("/my-events");
+      // navigate("/my-events");
     } catch (error) {
       console.error("행사 저장 실패:", error);
     } finally {
@@ -224,6 +227,7 @@ const MyEventFormPage = () => {
         </Paper>
 
         {/* 행사 설명 */}
+
         <Paper
           variant="outlined"
           sx={{ p: 3, mb: 3, borderRadius: 2, background: "#f7f9fa" }}
@@ -242,155 +246,22 @@ const MyEventFormPage = () => {
               handleInputChange("description", data);
             }}
             ref={editorRef}
+            hooks={{
+              addImageBlobHook: async (blob, callback) => {
+                // 1. base64로 변환 (임시)
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  callback(reader.result, "image");
+                };
+                reader.readAsDataURL(blob);
+              },
+            }}
           />
           {errors.description && (
             <FormHelperText error sx={{ mt: 1 }}>
               {errors.description}
             </FormHelperText>
           )}
-        </Paper>
-
-        {/* 상세 정보 */}
-        <Paper
-          variant="outlined"
-          sx={{ p: 3, mb: 3, borderRadius: 2, background: "#fafbfc" }}
-        >
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            상세 정보
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="최대 참가자 수 *"
-                type="number"
-                value={formData.maxParticipants}
-                onChange={(e) =>
-                  handleInputChange("maxParticipants", e.target.value)
-                }
-                error={Boolean(errors.maxParticipants)}
-                helperText={errors.maxParticipants}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>카테고리</InputLabel>
-                <Select
-                  value={formData.category}
-                  label="카테고리"
-                  onChange={(e) =>
-                    handleInputChange("category", e.target.value)
-                  }
-                >
-                  <MenuItem value="conference">컨퍼런스</MenuItem>
-                  <MenuItem value="workshop">워크샵</MenuItem>
-                  <MenuItem value="networking">네트워킹</MenuItem>
-                  <MenuItem value="seminar">세미나</MenuItem>
-                  <MenuItem value="other">기타</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="신청 시작 날짜"
-                type="date"
-                value={formData.date}
-                onChange={(e) => handleInputChange("date", e.target.value)}
-                error={Boolean(errors.date)}
-                helperText={errors.date}
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="신청 시작 시간"
-                type="time"
-                value={formData.time}
-                onChange={(e) => handleInputChange("time", e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-          </Grid>
-        </Paper>
-
-        {/* 투표 항목 (선택) */}
-        <Paper
-          variant="outlined"
-          sx={{ p: 3, mb: 3, borderRadius: 2, background: "#f7f9fa" }}
-        >
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            투표 항목 (선택)
-          </Typography>
-          {pollOptions.map((option, idx) => (
-            <Box
-              key={idx}
-              sx={{ display: "flex", alignItems: "center", mb: 1 }}
-            >
-              <TextField
-                fullWidth
-                label={`투표 항목 ${idx + 1}`}
-                value={option}
-                onChange={(e) => handlePollOptionChange(idx, e.target.value)}
-                sx={{ mr: 1 }}
-              />
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => handleRemovePollOption(idx)}
-                sx={{ minWidth: 36, px: 1 }}
-              >
-                삭제
-              </Button>
-            </Box>
-          ))}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddPollOption}
-            sx={{ mt: 1 }}
-          >
-            + 투표 항목 추가
-          </Button>
-        </Paper>
-
-        {/* 연락처 및 요구사항 */}
-        <Paper
-          variant="outlined"
-          sx={{ p: 3, mb: 3, borderRadius: 2, background: "#f7f9fa" }}
-        >
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            연락처 및 요구사항
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="연락처 이메일 *"
-                type="email"
-                value={formData.contactEmail}
-                onChange={(e) =>
-                  handleInputChange("contactEmail", e.target.value)
-                }
-                error={Boolean(errors.contactEmail)}
-                helperText={errors.contactEmail}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="연락처 전화번호"
-                value={formData.contactPhone}
-                onChange={(e) =>
-                  handleInputChange("contactPhone", e.target.value)
-                }
-              />
-            </Grid>
-          </Grid>
         </Paper>
 
         {/* 액션 버튼 */}
@@ -408,13 +279,20 @@ const MyEventFormPage = () => {
           <Button
             variant="contained"
             onClick={handleSubmit}
-            disabled={isSubmitting}
             startIcon={<SaveIcon />}
             sx={{ minWidth: 120, borderRadius: 2 }}
           >
-            {isSubmitting ? "저장 중..." : isEditing ? "수정" : "등록"}
+            {"등록"}
           </Button>
         </Box>
+      </Paper>
+
+      <Paper>
+        <ToastViewer
+          initialValue={formData.description}
+          key={formData.description} // force re-render on content change
+          usageStatistics={false}
+        />
       </Paper>
     </Container>
   );

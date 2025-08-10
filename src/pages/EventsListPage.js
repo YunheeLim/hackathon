@@ -37,6 +37,8 @@ const EventsListPage = () => {
   const navigate = useNavigate();
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
+  const [stateFilter, setStateFilter] = useState("all");
+  const [yeokrangFilter, setYeokrangFilter] = useState("all");
 
   const events = [
     {
@@ -48,9 +50,10 @@ const EventsListPage = () => {
       description: "최신 기술 트렌드를 공유하는 연례 기술 컨퍼런스입니다.",
       capacity: 500,
       registered: 320,
-      developmentTime: true,
+      developmentTime: "Y",
       applyStart: "2026-01-01T09:00:00",
       applyEnd: "2026-01-10T18:00:00",
+      state: "open",
     },
     {
       id: 2,
@@ -62,9 +65,10 @@ const EventsListPage = () => {
         "스타트업 창업자들과 투자자들이 만나는 네트워킹 이벤트입니다.",
       capacity: 100,
       registered: 40,
-      developmentTime: false,
+      developmentTime: "N",
       applyStart: "2025-08-05T09:00:00",
       applyEnd: "2025-08-15T18:00:00",
+      state: "open",
     },
     {
       id: 3,
@@ -75,9 +79,10 @@ const EventsListPage = () => {
       description: "AI 기술을 직접 체험하고 학습할 수 있는 워크샵입니다.",
       capacity: 50,
       registered: 50,
-      developmentTime: true,
+      developmentTime: "Y",
       applyStart: "2026-01-20T09:00:00",
       applyEnd: "2026-01-22T18:00:00",
+      state: "open",
     },
     {
       id: 4,
@@ -88,9 +93,10 @@ const EventsListPage = () => {
       description: "UX/UI 디자인 트렌드와 베스트 프랙티스를 공유합니다.",
       capacity: 200,
       registered: 80,
-      developmentTime: true,
+      developmentTime: "Y",
       applyStart: "2026-01-10T09:00:00",
       applyEnd: "2026-01-25T18:00:00",
+      state: "close",
     },
     {
       id: 5,
@@ -101,9 +107,10 @@ const EventsListPage = () => {
       description: "블록체인 개발자들이 모여 기술을 공유하는 밋업입니다.",
       capacity: 80,
       registered: 45,
-      developmentTime: false,
+      developmentTime: "N",
       applyStart: "2026-01-15T09:00:00",
       applyEnd: "2026-01-20T18:00:00",
+      state: "open",
     },
     {
       id: 6,
@@ -114,9 +121,10 @@ const EventsListPage = () => {
       description: "데이터 사이언스 분야의 최신 연구 결과를 공유합니다.",
       capacity: 300,
       registered: 150,
-      developmentTime: true,
+      developmentTime: "Y",
       applyStart: "2024-02-01T09:00:00",
       applyEnd: "2024-02-05T18:00:00",
+      state: "before",
     },
   ];
 
@@ -127,12 +135,32 @@ const EventsListPage = () => {
     { value: "popularity", label: "신청현황순" },
     { value: "name", label: "행사명순" },
   ];
+  const stateOptions = [
+    { value: "all", label: "전체" },
+    { value: "before", label: "신청 전" },
+    { value: "open", label: "신청 중" },
+    { value: "close", label: "마감" },
+  ];
+  const yeokrangOptions = [
+    { value: "all", label: "전체" },
+    { value: "Y", label: "부여" },
+    { value: "N", label: "미부여" },
+  ];
 
   const filteredAndSortedEvents = events
     .filter((event) => {
       const matchesCategory =
         categoryFilter === "all" || event.category === categoryFilter;
       return matchesCategory;
+    })
+    .filter((event) => {
+      const matchesState = stateFilter === "all" || event.state === stateFilter;
+      return matchesState;
+    })
+    .filter((event) => {
+      const matchesYeokrang =
+        yeokrangFilter === "all" || event.developmentTime === yeokrangFilter;
+      return matchesYeokrang;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -174,14 +202,7 @@ const EventsListPage = () => {
     const now = new Date();
     const start = new Date(event.applyStart);
     const end = new Date(event.applyEnd);
-
-    console.log(now, start, end);
-
-    if (now < start) return "upcoming"; // 신청전
-    if (now >= start && now <= end && event.registered < event.capacity)
-      return "open"; // 진행중
-    if (now > end && event.registered < event.capacity) return "closed"; // 신청마감
-    return "ended"; // 종료
+    return event.state;
   };
 
   const TableView = () => (
@@ -220,12 +241,8 @@ const EventsListPage = () => {
               </TableCell>
               <TableCell>
                 <Chip
-                  label={
-                    event.developmentTime
-                      ? "역량개발시간 부여"
-                      : "역량개발시간 미부여"
-                  }
-                  color={getDevelopmentTimeColor(event.developmentTime)}
+                  label={event.developmentTime}
+                  color={event.developmentTime === "Y" ? "primary" : "default"}
                   size="small"
                   icon={<SchoolIcon />}
                 />
@@ -314,6 +331,39 @@ const EventsListPage = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   {sortOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel>상태</InputLabel>
+                <Select
+                  value={stateFilter}
+                  label="상태"
+                  onChange={(e) => setStateFilter(e.target.value)}
+                >
+                  {stateOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel>역량</InputLabel>
+                <Select
+                  value={yeokrangFilter}
+                  label="역량"
+                  onChange={(e) => setYeokrangFilter(e.target.value)}
+                >
+                  {yeokrangOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
